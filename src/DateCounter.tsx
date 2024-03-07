@@ -4,6 +4,7 @@ interface State {
   count: number;
   step: number;
 }
+
 const initialState = { count: 0, step: 1 };
 
 function reducer(state: State, action: any) {
