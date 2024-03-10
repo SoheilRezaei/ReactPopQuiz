@@ -1,4 +1,8 @@
-export default function StartScreen({ numberOfQuestions }) {
+type StartScreenProps = {
+  numberOfQuestions: number;
+};
+
+export default function StartScreen({ numberOfQuestions }: StartScreenProps) {
   return (
     <div className="start">
       <h2>Welcome to the React PopQuiz!</h2>
