@@ -7,24 +7,36 @@ import StartScreen from "./StartScreen.tsx";
 import Error from "./Error.tsx";
 import Question from "./Question.tsx";
 
-interface State {
-  questions: object[] | undefined;
-  status: string;
-  index: number;
+interface Question {
+  question: string;
+  options: string[];
+  correctOption: number;
+  points: number;
 }
-type Action = {
-  type: string;
-  payload?: object[];
-};
+
+interface State {
+  questions: Question[] | undefined;
+  status: "loading" | "ready" | "active" | "error";
+  index: number;
+  answer: number | undefined;
+  points: number;
+}
+
+type dataReceived = { type: "dataReceived"; payload: Question[] };
+type dataFailed = { type: "dataFailed"; payload: Error };
+type newAnswer = { type: "newAnswer"; payload: number };
+type start = { type: "start" };
+
+type Action = dataReceived | dataFailed | start | newAnswer;
 
 const initialState = {
   questions: [],
-  // 'loading' | 'ready' | 'error' | 'active' | 'finished'
   status: "loading",
-  // index of the current question
   index: 0,
+  answer: undefined,
+  points: 0,
 };
-function reducer(state: State, action: Action) {
+function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "dataReceived":
       return { ...state, questions: action.payload, status: "ready" };
@@ -32,13 +44,24 @@ function reducer(state: State, action: Action) {
       return { ...state, status: "error" };
     case "start":
       return { ...state, status: "active" };
+    case "newAnswer": {
+      const question = state.questions?.at(state.index);
+      return {
+        ...state,
+        answer: action.payload,
+        points:
+          action.payload === question?.correctOption
+            ? state.points + (question?.points ?? 0)
+            : state.points,
+      };
+    }
     default:
       return state;
   }
 }
 
 export default function App() {
-  const [{ questions, status, index }, dispatch] = useReducer(
+  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -49,7 +72,7 @@ export default function App() {
     fetch("http://localhost:8000/questions")
       .then((response) => response.json())
       .then((data) => dispatch({ type: "dataReceived", payload: data }))
-      .catch((err) => dispatch({ type: "dataFailed" }));
+      .catch((err) => dispatch({ type: "dataFailed", payload: err }));
   }, []);
 
   return (
@@ -57,7 +80,7 @@ export default function App() {
       <Header />
 
       <MainComponent>
-        {status === "Loading" && <Loader />}
+        {status === "loading" && <Loader />}
         {status === "error" && <Error />}
         {status === "ready" && (
           <StartScreen
@@ -65,7 +88,13 @@ export default function App() {
             dispatch={dispatch}
           />
         )}
-        {status === "active" && <Question question={questions?.[index]} />}
+        {status === "active" && (
+          <Question
+            question={questions?.[index]}
+            dispatch={dispatch}
+            answer={answer}
+          />
+        )}
       </MainComponent>
     </div>
   );
