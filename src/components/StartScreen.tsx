@@ -1,6 +1,6 @@
 type StartScreenProps = {
   numberOfQuestions: number | undefined;
-  dispatch: React.Dispatch<{ type: string }>;
+  dispatch: React.Dispatch<{ type: "start" }>;
 };
 
 export default function StartScreen({
