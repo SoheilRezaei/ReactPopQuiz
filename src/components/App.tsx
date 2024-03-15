@@ -4,8 +4,9 @@ import Header from "./Header.tsx";
 import MainComponent from "./MainComponent.tsx";
 import Loader from "./Loader.tsx";
 import StartScreen from "./StartScreen.tsx";
-import Error from "./Error.tsx";
+import ServerError from "./ServerError.tsx";
 import Question from "./Question.tsx";
+import NextButton from "./NextButton.tsx";
 
 interface Question {
   question: string;
@@ -18,30 +19,33 @@ interface State {
   questions: Question[] | undefined;
   status: "loading" | "ready" | "active" | "error";
   index: number;
-  answer: number | undefined;
+  answer: number | null;
   points: number;
+  error: null | Error;
 }
 
 type dataReceived = { type: "dataReceived"; payload: Question[] };
 type dataFailed = { type: "dataFailed"; payload: Error };
 type newAnswer = { type: "newAnswer"; payload: number };
 type start = { type: "start" };
+type nextQuestion = { type: "nextQuestion" };
 
-type Action = dataReceived | dataFailed | start | newAnswer;
+type Action = dataReceived | dataFailed | start | newAnswer | nextQuestion;
 
 const initialState = {
   questions: [],
   status: "loading",
   index: 0,
-  answer: undefined,
+  answer: null,
   points: 0,
+  error: null,
 };
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "dataReceived":
       return { ...state, questions: action.payload, status: "ready" };
     case "dataFailed":
-      return { ...state, status: "error" };
+      return { ...state, status: "error", error: action.payload };
     case "start":
       return { ...state, status: "active" };
     case "newAnswer": {
@@ -55,13 +59,19 @@ function reducer(state: State, action: Action): State {
             : state.points,
       };
     }
+    case "nextQuestion":
+      return {
+        ...state,
+        index: state.index + 1,
+        answer: null,
+      };
     default:
-      return state;
+      throw new Error("Invalid action");
   }
 }
 
 export default function App() {
-  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
+  const [{ questions, status, index, answer, error }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -81,7 +91,7 @@ export default function App() {
 
       <MainComponent>
         {status === "loading" && <Loader />}
-        {status === "error" && <Error />}
+        {status === "error" && <ServerError />}
         {status === "ready" && (
           <StartScreen
             numberOfQuestions={numberOfQuestions}
@@ -89,11 +99,14 @@ export default function App() {
           />
         )}
         {status === "active" && (
-          <Question
-            question={questions?.[index]}
-            dispatch={dispatch}
-            answer={answer}
-          />
+          <>
+            <Question
+              question={questions?.[index]}
+              dispatch={dispatch}
+              answer={answer}
+            />
+            <NextButton dispatch={dispatch} answer={answer} />
+          </>
         )}
       </MainComponent>
     </div>
