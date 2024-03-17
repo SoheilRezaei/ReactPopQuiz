@@ -1,5 +1,7 @@
 # React + TypeScript + Vite
 
+The front-end can be deployed locally via `npm run dev` and the JSON file that contains the questions is running on JSONServer and can be deployed via `npm run server`.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
