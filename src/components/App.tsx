@@ -33,6 +33,7 @@ type newAnswer = { type: "newAnswer"; payload: number };
 type start = { type: "start" };
 type nextQuestion = { type: "nextQuestion" };
 type finished = { type: "finished" };
+type restart = { type: "restart" };
 
 type Action =
   | dataReceived
@@ -40,7 +41,8 @@ type Action =
   | start
   | newAnswer
   | nextQuestion
-  | finished;
+  | finished
+  | restart;
 
 const initialState = {
   questions: [],
@@ -77,15 +79,24 @@ function reducer(state: State, action: Action): State {
         answer: null,
       };
     case "finished":
-      return { ...state, status: "finished", highscore: state.points };
+      return {
+        ...state,
+        status: "finished",
+        highscore:
+          state.points > state.highscore ? state.points : state.highscore,
+      };
+    case "restart":
+      return { ...state, points: 0, highscore: 0, index: 0, answer: null };
     default:
       throw new Error("Invalid action");
   }
 }
 
 export default function App() {
-  const [{ questions, status, index, answer, points, error }, dispatch] =
-    useReducer(reducer, initialState);
+  const [
+    { questions, status, index, answer, points, highscore, error },
+    dispatch,
+  ] = useReducer(reducer, initialState);
 
   const numberOfQuestions: number = questions?.length;
   const maxPoints: number = questions?.reduce(
@@ -136,7 +147,12 @@ export default function App() {
           </>
         )}
         {status === "finished" && (
-          <FinishScreen points={points} maxPoints={maxPoints} />
+          <FinishScreen
+            points={points}
+            maxPoints={maxPoints}
+            highscore={highscore}
+            dispatch={dispatch}
+          />
         )}
       </MainComponent>
     </div>
