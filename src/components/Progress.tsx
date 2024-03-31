@@ -1,6 +1,6 @@
 type ProgressProps = {
   index: number;
-  totalQuestions: number | undefined;
+  totalQuestions: number;
   points: number;
   maxPoints: number;
   answer: number | undefined;
