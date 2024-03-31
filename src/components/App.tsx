@@ -7,6 +7,8 @@ import StartScreen from "./StartScreen.tsx";
 import ServerError from "./ServerError.tsx";
 import Question from "./Question.tsx";
 import NextButton from "./NextButton.tsx";
+import Progress from "./Progress.tsx";
+import FinishScreen from "./FinishScreen.tsx";
 
 interface Question {
   question: string;
@@ -71,12 +73,14 @@ function reducer(state: State, action: Action): State {
 }
 
 export default function App() {
-  const [{ questions, status, index, answer, error }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [{ questions, status, index, answer, points, error }, dispatch] =
+    useReducer(reducer, initialState);
 
   const numberOfQuestions: number | undefined = questions?.length;
+  const maxPoints: number = questions?.reduce(
+    (prev, curr) => prev + curr.points,
+    0
+  );
 
   useEffect(function () {
     fetch("http://localhost:8000/questions")
@@ -100,6 +104,13 @@ export default function App() {
         )}
         {status === "active" && (
           <>
+            <Progress
+              index={index}
+              totalQuestions={numberOfQuestions}
+              points={points}
+              maxPoints={maxPoints}
+              answer={answer}
+            />
             <Question
               question={questions?.[index]}
               dispatch={dispatch}
@@ -107,6 +118,9 @@ export default function App() {
             />
             <NextButton dispatch={dispatch} answer={answer} />
           </>
+        )}
+        {status === "finished" && (
+          <FinishScreen points={points} maxPoints={maxPoints} />
         )}
       </MainComponent>
     </div>
