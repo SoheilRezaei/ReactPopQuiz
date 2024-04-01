@@ -7,6 +7,8 @@ import StartScreen from "./StartScreen.tsx";
 import ServerError from "./ServerError.tsx";
 import Question from "./Question.tsx";
 import NextButton from "./NextButton.tsx";
+import Progress from "./Progress.tsx";
+import FinishScreen from "./FinishScreen.tsx";
 
 interface Question {
   question: string;
@@ -17,11 +19,12 @@ interface Question {
 
 interface State {
   questions: Question[] | undefined;
-  status: "loading" | "ready" | "active" | "error";
+  status: "loading" | "ready" | "active" | "error" | "finished";
   index: number;
   answer: number | null;
   points: number;
   error: null | Error;
+  highscore: number;
 }
 
 type dataReceived = { type: "dataReceived"; payload: Question[] };
@@ -29,8 +32,17 @@ type dataFailed = { type: "dataFailed"; payload: Error };
 type newAnswer = { type: "newAnswer"; payload: number };
 type start = { type: "start" };
 type nextQuestion = { type: "nextQuestion" };
+type finished = { type: "finished" };
+type restart = { type: "restart" };
 
-type Action = dataReceived | dataFailed | start | newAnswer | nextQuestion;
+type Action =
+  | dataReceived
+  | dataFailed
+  | start
+  | newAnswer
+  | nextQuestion
+  | finished
+  | restart;
 
 const initialState = {
   questions: [],
@@ -39,6 +51,7 @@ const initialState = {
   answer: null,
   points: 0,
   error: null,
+  highscore: 0,
 };
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -65,18 +78,31 @@ function reducer(state: State, action: Action): State {
         index: state.index + 1,
         answer: null,
       };
+    case "finished":
+      return {
+        ...state,
+        status: "finished",
+        highscore:
+          state.points > state.highscore ? state.points : state.highscore,
+      };
+    case "restart":
+      return { ...initialState, questions: state.questions, status: "ready" };
     default:
       throw new Error("Invalid action");
   }
 }
 
 export default function App() {
-  const [{ questions, status, index, answer, error }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [
+    { questions, status, index, answer, points, highscore, error },
+    dispatch,
+  ] = useReducer(reducer, initialState);
 
-  const numberOfQuestions: number | undefined = questions?.length;
+  const numberOfQuestions: number = questions?.length;
+  const maxPoints: number = questions?.reduce(
+    (prev, curr) => prev + curr.points,
+    0
+  );
 
   useEffect(function () {
     fetch("http://localhost:8000/questions")
@@ -100,13 +126,33 @@ export default function App() {
         )}
         {status === "active" && (
           <>
+            <Progress
+              index={index}
+              totalQuestions={numberOfQuestions}
+              points={points}
+              maxPoints={maxPoints}
+              answer={answer}
+            />
             <Question
               question={questions?.[index]}
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton dispatch={dispatch} answer={answer} />
+            <NextButton
+              dispatch={dispatch}
+              answer={answer}
+              index={index}
+              totalQuestions={numberOfQuestions}
+            />
           </>
+        )}
+        {status === "finished" && (
+          <FinishScreen
+            points={points}
+            maxPoints={maxPoints}
+            highscore={highscore}
+            dispatch={dispatch}
+          />
         )}
       </MainComponent>
     </div>
