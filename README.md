@@ -1,3 +1,6 @@
+Future upcoming changes:
+Adding a timer, Adding more questions, creating a random selection to go through and choose 15 questions.
+
 # React + TypeScript + Vite
 
 The front-end can be deployed locally via `npm run dev` and the JSON file that contains the questions is running on JSONServer and can be deployed via `npm run server`.
