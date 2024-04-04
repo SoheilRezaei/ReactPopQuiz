@@ -6,7 +6,7 @@ import Loader from "./Loader.tsx";
 import StartScreen from "./StartScreen.tsx";
 import ServerError from "./ServerError.tsx";
 import Question from "./Question.tsx";
-import NextButton from "./NextButton.tsx";
+import Footer from "./Footer.tsx";
 import Progress from "./Progress.tsx";
 import FinishScreen from "./FinishScreen.tsx";
 
@@ -35,7 +35,7 @@ type nextQuestion = { type: "nextQuestion" };
 type finished = { type: "finished" };
 type restart = { type: "restart" };
 
-type Action =
+export type Action =
   | dataReceived
   | dataFailed
   | start
@@ -138,12 +138,7 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton
-              dispatch={dispatch}
-              answer={answer}
-              index={index}
-              totalQuestions={numberOfQuestions}
-            />
+            <Footer />
           </>
         )}
         {status === "finished" && (
