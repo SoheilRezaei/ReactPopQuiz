@@ -1,14 +1,19 @@
-import React from "react";
-export default function Timer() {
-  const [time, setTime] = React.useState(0);
+import { useEffect } from "react";
+import { Action } from "./App.tsx";
 
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setTime((time) => time + 1);
-    }, 1000);
+type TimerProps = {
+  dispatch: React.Dispatch<Action>;
+  secondsRemaining: number;
+};
 
-    return () => clearInterval(interval);
-  }, []);
-
-  return <p className="timer">Time: {time}</p>;
+export default function Timer({ dispatch, secondsRemaining }: TimerProps) {
+  useEffect(
+    function () {
+      setInterval(() => {
+        dispatch({ type: "tick" });
+      }, 1000);
+    },
+    [dispatch]
+  );
+  return <p className="timer">{secondsRemaining}</p>;
 }

@@ -25,6 +25,7 @@ interface State {
   points: number;
   error: null | Error;
   highscore: number;
+  secondsRemaining: number;
 }
 
 type dataReceived = { type: "dataReceived"; payload: Question[] };
@@ -34,6 +35,7 @@ type start = { type: "start" };
 type nextQuestion = { type: "nextQuestion" };
 type finished = { type: "finished" };
 type restart = { type: "restart" };
+type tick = { type: "tick" };
 
 export type Action =
   | dataReceived
@@ -42,7 +44,8 @@ export type Action =
   | newAnswer
   | nextQuestion
   | finished
-  | restart;
+  | restart
+  | tick;
 
 const initialState = {
   questions: [],
@@ -52,6 +55,7 @@ const initialState = {
   points: 0,
   error: null,
   highscore: 0,
+  secondsRemaining: 10,
 };
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -87,6 +91,11 @@ function reducer(state: State, action: Action): State {
       };
     case "restart":
       return { ...initialState, questions: state.questions, status: "ready" };
+    case "tick":
+      return {
+        ...state,
+        secondsRemaining: state.secondsRemaining - 1,
+      };
     default:
       throw new Error("Invalid action");
   }
@@ -94,7 +103,16 @@ function reducer(state: State, action: Action): State {
 
 export default function App() {
   const [
-    { questions, status, index, answer, points, highscore, error },
+    {
+      questions,
+      status,
+      index,
+      answer,
+      points,
+      highscore,
+      error,
+      secondsRemaining,
+    },
     dispatch,
   ] = useReducer(reducer, initialState);
 
@@ -138,7 +156,13 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <Footer />
+            <Footer
+              dispatch={dispatch}
+              secondsRemaining={secondsRemaining}
+              answer={answer}
+              index={index}
+              numberOfQuestions={numberOfQuestions}
+            />
           </>
         )}
         {status === "finished" && (
