@@ -55,8 +55,11 @@ const initialState = {
   points: 0,
   error: null,
   highscore: 0,
-  secondsRemaining: 10,
+  secondsRemaining: null,
 };
+
+const SECS_PER_QUESTION = 30;
+
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "dataReceived":
@@ -64,7 +67,13 @@ function reducer(state: State, action: Action): State {
     case "dataFailed":
       return { ...state, status: "error", error: action.payload };
     case "start":
-      return { ...state, status: "active" };
+      return {
+        ...state,
+        status: "active",
+        secondsRemaining: state.questions
+          ? state.questions.length * SECS_PER_QUESTION
+          : 0,
+      };
     case "newAnswer": {
       const question = state.questions?.at(state.index);
       return {
@@ -95,6 +104,7 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         secondsRemaining: state.secondsRemaining - 1,
+        status: state.secondsRemaining === 0 ? "finished" : state.status,
       };
     default:
       throw new Error("Invalid action");

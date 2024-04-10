@@ -9,9 +9,11 @@ type TimerProps = {
 export default function Timer({ dispatch, secondsRemaining }: TimerProps) {
   useEffect(
     function () {
-      setInterval(() => {
+      const interval = setInterval(() => {
         dispatch({ type: "tick" });
       }, 1000);
+
+      return () => clearInterval(interval);
     },
     [dispatch]
   );
