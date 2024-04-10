@@ -6,7 +6,7 @@ import Loader from "./Loader.tsx";
 import StartScreen from "./StartScreen.tsx";
 import ServerError from "./ServerError.tsx";
 import Question from "./Question.tsx";
-import NextButton from "./NextButton.tsx";
+import Footer from "./Footer.tsx";
 import Progress from "./Progress.tsx";
 import FinishScreen from "./FinishScreen.tsx";
 
@@ -25,6 +25,7 @@ interface State {
   points: number;
   error: null | Error;
   highscore: number;
+  secondsRemaining: number;
 }
 
 type dataReceived = { type: "dataReceived"; payload: Question[] };
@@ -34,15 +35,17 @@ type start = { type: "start" };
 type nextQuestion = { type: "nextQuestion" };
 type finished = { type: "finished" };
 type restart = { type: "restart" };
+type tick = { type: "tick" };
 
-type Action =
+export type Action =
   | dataReceived
   | dataFailed
   | start
   | newAnswer
   | nextQuestion
   | finished
-  | restart;
+  | restart
+  | tick;
 
 const initialState = {
   questions: [],
@@ -52,7 +55,11 @@ const initialState = {
   points: 0,
   error: null,
   highscore: 0,
+  secondsRemaining: null,
 };
+
+const SECS_PER_QUESTION = 30;
+
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "dataReceived":
@@ -60,7 +67,13 @@ function reducer(state: State, action: Action): State {
     case "dataFailed":
       return { ...state, status: "error", error: action.payload };
     case "start":
-      return { ...state, status: "active" };
+      return {
+        ...state,
+        status: "active",
+        secondsRemaining: state.questions
+          ? state.questions.length * SECS_PER_QUESTION
+          : 0,
+      };
     case "newAnswer": {
       const question = state.questions?.at(state.index);
       return {
@@ -87,6 +100,12 @@ function reducer(state: State, action: Action): State {
       };
     case "restart":
       return { ...initialState, questions: state.questions, status: "ready" };
+    case "tick":
+      return {
+        ...state,
+        secondsRemaining: state.secondsRemaining - 1,
+        status: state.secondsRemaining === 0 ? "finished" : state.status,
+      };
     default:
       throw new Error("Invalid action");
   }
@@ -94,7 +113,16 @@ function reducer(state: State, action: Action): State {
 
 export default function App() {
   const [
-    { questions, status, index, answer, points, highscore, error },
+    {
+      questions,
+      status,
+      index,
+      answer,
+      points,
+      highscore,
+      error,
+      secondsRemaining,
+    },
     dispatch,
   ] = useReducer(reducer, initialState);
 
@@ -138,11 +166,12 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton
+            <Footer
               dispatch={dispatch}
+              secondsRemaining={secondsRemaining}
               answer={answer}
               index={index}
-              totalQuestions={numberOfQuestions}
+              numberOfQuestions={numberOfQuestions}
             />
           </>
         )}
