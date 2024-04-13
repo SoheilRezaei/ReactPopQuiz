@@ -7,6 +7,9 @@ type TimerProps = {
 };
 
 export default function Timer({ dispatch, secondsRemaining }: TimerProps) {
+  const mins = Math.floor(secondsRemaining / 60);
+  const seconds = secondsRemaining % 60;
+
   useEffect(
     function () {
       const interval = setInterval(() => {
@@ -17,5 +20,11 @@ export default function Timer({ dispatch, secondsRemaining }: TimerProps) {
     },
     [dispatch]
   );
-  return <p className="timer">{secondsRemaining}</p>;
+  return (
+    <p className="timer">
+      {mins < 10 && "0"}
+      {mins}:{seconds < 10 && "0"}
+      {seconds}
+    </p>
+  );
 }
