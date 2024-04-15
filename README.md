@@ -1,5 +1,5 @@
 Future upcoming changes:
-Adding a timer, Adding more questions, creating a random selection to go through and choose 15 questions.
+Adding a timer(Done), Adding more questions(  ), creating a random selection to go through and choose 15 questions(   ).
 
 # React + TypeScript + Vite
 
