@@ -1,12 +1,14 @@
+import { useQuiz } from "../context/QuizContext.tsx";
+
 type StartScreenProps = {
   numberOfQuestions: number | undefined;
   dispatch: React.Dispatch<{ type: "start" }>;
 };
 
-export default function StartScreen({
-  numberOfQuestions,
-  dispatch,
-}: StartScreenProps) {
+export default function StartScreen() {
+
+  const { numberOfQuestions, dispatch } : StartScreenProps = useQuiz();
+
   return (
     <div className="start">
       <h2>Welcome to the React PopQuiz!</h2>

@@ -2,9 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./components/App.tsx";
 import "./index.css";
+import { QuizProvider } from "./context/QuizContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <QuizProvider>
+            <App />
+        </QuizProvider>
+    </React.StrictMode>
 );

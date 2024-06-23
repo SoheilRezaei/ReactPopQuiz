@@ -1,25 +1,25 @@
 import Options from "./Options";
+import { useQuiz } from "../context/QuizContext.tsx";
 
 type QuestionProps = {
-  question: {
-    question: string;
-    options: string[];
-    correctOption: number;
-  };
+  questions:  {
+        question: string;
+        options: string[];
+        correctOption: number;
+    };
   dispatch: React.Dispatch<{ type: string }>;
   answer: number | null;
 };
 
-export default function Question({
-  question,
-  dispatch,
-  answer,
-}: QuestionProps) {
-  console.log(question);
+export default function Question(){
+
+  const {questions, index } : QuestionProps = useQuiz();
+  const question = questions.at(index);
+
   return (
     <div>
       <h4>{question.question}</h4>
-      <Options question={question} dispatch={dispatch} answer={answer} />
+      <Options question={question} />
     </div>
   );
 }

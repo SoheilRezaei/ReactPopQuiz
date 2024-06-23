@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { Action } from "./App.tsx";
+import { useQuiz } from "../context/QuizContext.tsx";
 
 type TimerProps = {
   dispatch: React.Dispatch<Action>;
   secondsRemaining: number;
 };
 
-export default function Timer({ dispatch, secondsRemaining }: TimerProps) {
+export default function Timer() {
+  const { dispatch, secondsRemaining } : TimerProps = useQuiz();
   const mins = Math.floor(secondsRemaining / 60);
   const seconds = secondsRemaining % 60;
 

@@ -1,3 +1,5 @@
+import { useQuiz } from "../context/QuizContext.tsx";
+
 type OptionsProps = {
   question: {
     question: string;
@@ -7,7 +9,8 @@ type OptionsProps = {
   dispatch: React.Dispatch<{ type: string; payload: number }>;
   answer: number | null;
 };
-export default function Options({ question, dispatch, answer }: OptionsProps) {
+export default function Options({ question }) {
+  const { dispatch, answer} : OptionsProps = useQuiz();
   const hasAnswered = answer !== null;
 
   return (
