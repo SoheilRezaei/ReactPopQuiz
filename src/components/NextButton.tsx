@@ -1,18 +1,18 @@
+import { useQuiz } from "../context/QuizContext.tsx";
+
 type NextButtonProps = {
   dispatch: React.Dispatch<{ type: "nextQuestion" | "finished" }>;
   answer: number | null;
   index: number;
-  totalQuestions: number;
+  numberOfQuestions: number;
 };
-export default function NextButton({
-  dispatch,
-  answer,
-  index,
-  totalQuestions,
-}: NextButtonProps) {
+export default function NextButton() {
+
+  const {dispatch, answer, index, numberOfQuestions} : NextButtonProps = useQuiz();
+
   if (answer === null) return null;
 
-  if (index < totalQuestions - 1)
+  if (index < numberOfQuestions - 1)
     return (
       <button
         className="btn btn-ui"
@@ -21,7 +21,7 @@ export default function NextButton({
         Next
       </button>
     );
-  if (index === totalQuestions - 1)
+  if (index === numberOfQuestions - 1)
     return (
       <button
         className="btn btn-ui"

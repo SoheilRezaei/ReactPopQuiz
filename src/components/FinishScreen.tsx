@@ -1,3 +1,5 @@
+import { useQuiz } from "../context/QuizContext.tsx";
+
 type FinishScreenProps = {
   points: number;
   maxPoints: number;
@@ -5,12 +7,10 @@ type FinishScreenProps = {
   dispatch: React.Dispatch<{ type: "restart" }>;
 };
 
-export default function FinishScreen({
-  points,
-  maxPoints,
-  highscore,
-  dispatch,
-}: FinishScreenProps) {
+export default function FinishScreen() {
+
+  const { points, maxPoints, highscore, dispatch } : FinishScreenProps = useQuiz();
+
   const precentage = (points / maxPoints) * 100;
   let emoji: string;
   if (precentage === 100) emoji = "🥇";

@@ -1,6 +1,7 @@
 import NextButton from "./NextButton.tsx";
 import Timer from "./Timer.tsx";
 import { Action } from "./App.tsx";
+
 type FooterProps = {
   dispatch: React.Dispatch<Action>;
   answer: number | null;
@@ -9,22 +10,12 @@ type FooterProps = {
   secondsRemaining: number;
 };
 
-export default function Footer({
-  dispatch,
-  answer,
-  index,
-  numberOfQuestions,
-  secondsRemaining,
-}: FooterProps) {
+export default function Footer(){
+
   return (
     <footer>
-      <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
-      <NextButton
-        dispatch={dispatch}
-        answer={answer}
-        index={index}
-        totalQuestions={numberOfQuestions}
-      />
+      <Timer />
+      <NextButton />
     </footer>
   );
 }

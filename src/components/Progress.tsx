@@ -1,26 +1,25 @@
+import { useQuiz } from "../context/QuizContext.tsx";
+
 type ProgressProps = {
   index: number;
-  totalQuestions: number;
+  numberOfQuestions: number;
   points: number;
   maxPoints: number;
   answer: number | undefined;
 };
 
-export default function Progress({
-  index,
-  totalQuestions,
-  points,
-  maxPoints,
-  answer,
-}: ProgressProps) {
+export default function Progress() {
+
+  const {index, numberOfQuestions, points, maxPoints, answer} : ProgressProps = useQuiz();
+
   return (
     <header className="progress">
       <progress
-        max={totalQuestions}
+        max={numberOfQuestions}
         value={index + Number(answer !== null)}
       ></progress>
       <p>
-        Question <strong>{index + 1}</strong> / {totalQuestions}
+        Question <strong>{index + 1}</strong> / {numberOfQuestions}
       </p>
       <p>
         <strong>{points}</strong> / {maxPoints}
